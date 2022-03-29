@@ -10,15 +10,17 @@ export default class QueueTaskManager extends TaskManager {
   }
 
   addTask({ uid, priority, handler }) {
-    async function wrapper() {
-      try {
-        const result = await handler();
-        this.cache.set(uid, result);
-      } catch (e) {
-        this.cache.set(uid, e);
-      }
-    }
-    this.queue.add(() => wrapper, { uid, priority });
+    this.queue.add(
+      async () => {
+        try {
+          const result = await handler();
+          this.cache.set(uid, result, 10000);
+        } catch (e) {
+          this.cache.set(uid, e, 10000);
+        }
+      },
+      { uid, priority }
+    );
   }
   exists(uid) {
     return this.queue.sizeBy({ uid }) > 0;
