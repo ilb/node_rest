@@ -1,6 +1,7 @@
 import TaskManager from './TaskManager';
 import PQueue from '@ilb/p-queue';
 import NodeCache from 'node-cache';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class QueueTaskManager extends TaskManager {
   constructor(options) {
@@ -9,7 +10,8 @@ export default class QueueTaskManager extends TaskManager {
     this.queue = new PQueue(options);
   }
 
-  addTask({ uid, priority, handler }) {
+  addTask({ priority = 0, handler }) {
+    const uid = uuidv4();
     this.queue.add(
       async () => {
         try {
@@ -21,6 +23,7 @@ export default class QueueTaskManager extends TaskManager {
       },
       { uid, priority }
     );
+    return uid;
   }
   exists(uid) {
     return this.queue.sizeBy({ uid }) > 0;
