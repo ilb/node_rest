@@ -1,8 +1,10 @@
 import nc from 'next-connect';
+import Response from './Response.js';
 
-const AsyncConnect = ({ path, adapter, handler }) => {
+const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
   if (!path) throw new Error('API path should be defined');
-  if (!handler) throw new Error('Task handler should be defined');
+  if (!taskManager) throw new Error('Task manager should be defined');
+  if (!task) throw new Error('Task function should be defined');
 
   /**
    * Add new task to the queue
@@ -10,7 +12,8 @@ const AsyncConnect = ({ path, adapter, handler }) => {
    * @param {*} res
    */
   const addTask = async (req, res) => {
-    const uuid = taskManager.addTask({ handler });
+    const context = req.body;
+    const uuid = taskManager.addTask(task, { context });
     res.redirect(303, `${path}/${uuid}`);
   };
 
@@ -21,11 +24,16 @@ const AsyncConnect = ({ path, adapter, handler }) => {
    */
   const getTask = async (req, res) => {
     const { uuid } = req.params;
+    if (!taskManager.exists(uuid)) {
+      res.status(404).send();
+      return;
+    }
+
     if (taskManager.isDone(uuid)) {
       const response = await taskManager.getResult(uuid);
 
       if (response instanceof Error) {
-        res.status(response.status).send(response.message);
+        throw response;
       }
 
       if (response instanceof Response) {
@@ -33,25 +41,31 @@ const AsyncConnect = ({ path, adapter, handler }) => {
           res.setHeader(header, value);
         }
         res.status(200).send(response.content);
+        return;
       }
 
-      res.status(200).json({ data: response });
+      res.status(200).json(response);
     } else {
       res.setHeader('Refresh', `3;${path}/${uuid}`);
       res.status(202).end();
     }
   };
 
-  const nextApiHandler = nc({ attachParams: true }).post('/', addTask).get('/:uuid', getTask);
+  const nextApiHandler = nc().use(
+    path,
+    nc({ attachParams: true, onError }).post(addTask).get(`/:uuid`, getTask)
+  );
 
   /**
    * Util method to incapsulate request call for adding new task
    * @param {Object} context task context
    */
-  nextApiHandler.addTask = async (context) => {
-    const uuid = taskManager.addTask({ handler });
+  nextApiHandler.addTask = (context) => {
+    const uuid = taskManager.addTask(task, { context });
     return (res) => res.redirect(303, `${path}/${uuid}`);
   };
+
+  return nextApiHandler;
 };
 
 export default AsyncConnect;
