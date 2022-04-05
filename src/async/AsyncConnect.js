@@ -6,6 +6,13 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
   if (!taskManager) throw new Error('Task manager should be defined');
   if (!task) throw new Error('Task function should be defined');
 
+  let basePath = '';
+  let apiPath = path;
+  if (!path.startsWith('/api')) {
+    basePath = path.split('/api').shift();
+    apiPath = path.slice(path.indexOf('/api'));
+  }
+
   /**
    * Add new task to the queue
    * @param {*} req
@@ -14,7 +21,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
   const addTask = async (req, res) => {
     const context = req.body;
     const uuid = taskManager.addTask(task, { context });
-    res.redirect(303, `${process.env.BASEPATH}${path}/${uuid}`);
+    res.redirect(303, `${basePath}${apiPath}/${uuid}`);
   };
 
   /**
@@ -46,13 +53,13 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
 
       res.status(200).json(response);
     } else {
-      res.setHeader('Refresh', `3;${path}/${uuid}`);
+      res.setHeader('Refresh', `3;${basePath}${apiPath}/${uuid}`);
       res.status(202).end();
     }
   };
 
   const nextApiHandler = nc().use(
-    path,
+    apiPath,
     nc({ attachParams: true, onError }).post(addTask).get(`/:uuid`, getTask)
   );
 
@@ -62,7 +69,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
    */
   nextApiHandler.addTask = (context) => {
     const uuid = taskManager.addTask(task, { context });
-    return (res) => res.redirect(303, `${process.env.BASEPATH}${path}/${uuid}`);
+    return (res) => res.redirect(303, `${basePath}${apiPath}/${uuid}`);
   };
 
   return nextApiHandler;

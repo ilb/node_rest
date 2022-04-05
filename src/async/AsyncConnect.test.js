@@ -1,9 +1,11 @@
 import { jest } from '@jest/globals';
 import delay from 'delay';
-import { testApiHandler } from 'next-test-api-route-handler';
+import nextTestApiHandler from 'next-test-api-route-handler';
 import AsyncConnect from './AsyncConnect';
 import QueueTaskManager from './QueueTaskManager';
 import Response from './Response';
+
+const { testApiHandler } = nextTestApiHandler;
 
 let task;
 let taskManager;
@@ -17,7 +19,7 @@ beforeAll(async () => {
     () => ({
       __esModule: true,
       default: AsyncConnect({
-        path: '/api/queues/test',
+        path: '/basePath/api/queues/test',
         taskManager,
         task,
         onError: (err, req, res, next) => {
@@ -50,7 +52,10 @@ describe('addTask()', () => {
       };
       const executeResponse = RouteWithAsyncConnect.default.addTask();
       executeResponse(response);
-      expect(response.redirect).toBeCalledWith(303, expect.stringMatching('/api/queues/test'));
+      expect(response.redirect).toBeCalledWith(
+        303,
+        expect.stringMatching('/basePath/api/queues/test')
+      );
     });
   });
   describe('When POSTing a new task', () => {
@@ -61,7 +66,7 @@ describe('addTask()', () => {
         test: async ({ fetch }) => {
           const res = await fetch({ method: 'POST', redirect: 'manual' });
           expect(res.status).toBe(303);
-          expect(res.headers.get('location')).toMatch('/api/queues/test');
+          expect(res.headers.get('location')).toMatch('/basePath/api/queues/test');
         }
       });
     });
@@ -116,7 +121,7 @@ describe('getTask()', () => {
         test: async ({ fetch }) => {
           const res = await fetch({ method: 'GET' });
           expect(res.status).toBe(202);
-          expect(res.headers.get('refresh')).toStrictEqual(`3;/api/queues/test/${uuid}`);
+          expect(res.headers.get('refresh')).toStrictEqual(`3;/basePath/api/queues/test/${uuid}`);
         }
       });
     });
