@@ -14,7 +14,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
   const addTask = async (req, res) => {
     const context = req.body;
     const uuid = taskManager.addTask(task, { context });
-    res.redirect(303, `${path}/${uuid}`);
+    res.redirect(303, `${process.env.BASEPATH}${path}/${uuid}`);
   };
 
   /**
@@ -62,7 +62,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
    */
   nextApiHandler.addTask = (context) => {
     const uuid = taskManager.addTask(task, { context });
-    return (res) => res.redirect(303, `${path}/${uuid}`);
+    return (res) => res.redirect(303, `${process.env.BASEPATH}${path}/${uuid}`);
   };
 
   return nextApiHandler;
