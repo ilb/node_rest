@@ -1,4 +1,6 @@
+.next
 node_modules
+ilb-node_rest*
 
 # Output of 'npm pack'
 *.tgz
