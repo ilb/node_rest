@@ -4,49 +4,69 @@ import { onError, onNoMatch } from '../middlewares/errors.js';
 class Router {
   constructor(params, createScope) {
     this.createScope = createScope;
-    this.params = params;
-    this.usecases = {};
+    this.nextConnect = nc(params);
+    this.prefix = '';
   }
 
-  get(usecase) {
-    this.usecases.get = usecase;
+  use(...params) {
+    this.nextConnect.use(...params);
 
     return this;
   }
 
-  post(usecase) {
-    this.usecases.post = usecase;
+  get(pathOrUsecase, usecase) {
+    this.addHandler(pathOrUsecase, usecase, 'get')
 
     return this;
   }
 
-  put(usecase) {
-    this.usecases.put = usecase;
+  post(pathOrUsecase, usecase) {
+    this.addHandler(pathOrUsecase, usecase, 'post')
 
     return this;
   }
 
-  delete(usecase) {
-    this.usecases.delete = usecase;
+  put(pathOrUsecase, usecase) {
+    this.addHandler(pathOrUsecase, usecase, 'put')
+
+    return this;
+  }
+
+  delete(pathOrUsecase, usecase) {
+    this.addHandler(pathOrUsecase, usecase, 'delete')
+
+    return this;
+  }
+
+  buildCallback(usecase) {
+    const builder = new usecase.builder(this.createScope);
+
+    return (req, res, next) => builder.build(req, res, next, usecase)
+  }
+
+  setPrefix(prefix) {
+    this.prefix = prefix;
 
     return this;
   }
 
   build() {
-    const nextConnect = nc(this.params);
+    return this.nextConnect;
+  }
 
-    for (const method in this.usecases) {
-      const usecase = this.usecases[method];
-      const builder = new usecase.builder(this.createScope);
-      const callback = (req, res, next) => builder.build(req, res, next, usecase)
-
-      nextConnect[method](callback);
+  addHandler(pathOrUsecase, usecase, method) {
+    if (this.isPath(pathOrUsecase)) {
+      this.nextConnect[method](this.prefix + pathOrUsecase, this.buildCallback(usecase))
+    } else {
+      this.nextConnect[method](this.buildCallback(pathOrUsecase))
     }
+  }
 
-    return nextConnect;
+  isPath(usecaseOrPath) {
+    return typeof usecaseOrPath === 'string';
   }
 }
 
 export default (createScope) => {
-  return new Router({ onNoMatch, onError }, createScope);
+  return new Router({ attachParams: true, onNoMatch, onError }, createScope);
 }

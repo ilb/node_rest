@@ -8,6 +8,13 @@ export default class BaseProcessor {
     this.context = { query: {} };
   }
 
+  async initialize(req, res, next) {
+    this.res = res;
+    this.context = { query: { ...req.query, ...req.body, ...req.params }, req };
+    this.scope = await this.createScope(this.context.req, true, null, next);
+  }
+
+
   async build(req, res, next, usecaseInstance) {
     try {
       await this.initialize(req, res, next);
@@ -32,24 +39,16 @@ export default class BaseProcessor {
         return this.internalError();
       }
     }
-
   }
 
-  async execute(usecase) {
-    usecase.initialize && await usecase.initialize(this.context.query);
-    usecase.checkAccess && await usecase.checkAccess();
-    usecase.validate && await usecase.validate(this.context.query);
+  async process(usecase) {
+    const instance = new usecase(this.scope.cradle);
 
-    return await usecase.process(this.context.query);
+    instance.checkAccess && await instance.checkAccess();
+    instance.initialize && await instance.initialize(this.context.query);
+    instance.validate && await instance.validate(this.context.query);
 
-  }
-
-  async initialize(req, res, next) {
-
-  }
-
-  async process(usecaseInstance) {
-
+    return instance.process(this.context.query);
   }
 
   async buildResponse() {

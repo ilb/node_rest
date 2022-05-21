@@ -88,10 +88,6 @@ export default class BaseUsecase {
     return null;
   }
 
-  async prepare() {
-    return null;
-  }
-
   async process() {
     return null;
   }

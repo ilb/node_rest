@@ -11,8 +11,85 @@ $ npm install --save @bb/node-async
 Оглавление
 -----------------
 1. [run](#run)
-1. [checkResult](#checkResult)
-1. [clearResult](#clearResult)
+2. [checkResult](#checkResult)
+3. [clearResult](#clearResult)
+
+Роутинг
+-----------------
+
+#### Использование
+
+Для одиночного роута
+```js
+export default router(createScope).post(CreateOffer).put(EditOffer).build();
+```
+Для группы роутов:
+```js
+export default (() =>
+  router(createScope).setPrefix('/api/offers/:uuid/')
+    .post('', CreateOffer)
+    .put('monitor', MonitorOffer)
+    .get('templates/:code', DownloadTemplates)
+    .build()
+)();
+```
+* `createScope` - замыкание, которое выполняется перед запуском `usecase`
+* CreateOffer, MonitorOffer, DownloadTemplates - классы `usecase`
+
+Юзкейсы
+-----------------
+Должны наследоваться от `ApiUsecase`, `AccessorUsecase` или `FileUsecase`
+
+```js
+export default class EditOffer extends ApiUsecase {
+
+  constructor({ ...scope }) {
+    super(scope);
+    this.permission = 'update_offers';
+  }
+
+  async initialize({ uuid }) {
+    // constructor
+  }
+  
+  async process() {
+    // do something
+  }
+
+  async schema() {
+    // ajv schema for validation
+  }
+}
+```
+```js
+export default class MonitorOffer extends AccessorUsecase {
+  constructor({ ...scope }) {
+    super(scope);
+  }
+
+  async process() {
+    // ...
+    if (condition) {
+      return { /* ... */ }; // завершение работы accessor
+    }
+
+    return null; // продолжение работы accessor
+  }
+}
+
+```
+```js
+export default class DownloadTemplates extends FileUsecase {
+  constructor({ ...scope }) {
+    super(scope);
+  }
+
+  async process({ uuid }) {
+    // ...
+    return { file, contentType, filename };
+  }
+}
+```
 
 <a name="run">run</a>
 ---------------
