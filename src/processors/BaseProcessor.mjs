@@ -11,7 +11,7 @@ export default class BaseProcessor {
   async initialize(req, res, next) {
     this.res = res;
     this.context = { query: { ...req.query, ...req.body, ...req.params }, req };
-    this.scope = await this.createScope(this.context.req, true, null, next);
+    this.scope = await this.createScope(this.context.req, next);
   }
 
 
