@@ -44,8 +44,8 @@ export default class BaseProcessor {
   async process(usecase) {
     const instance = new usecase(this.scope.cradle);
 
-    instance.checkAccess && await instance.checkAccess();
     instance.initialize && await instance.initialize(this.context.query);
+    instance.checkAccess && await instance.checkAccess();
     instance.validate && await instance.validate(this.context.query);
 
     return instance.process(this.context.query);
