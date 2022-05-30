@@ -1,5 +1,5 @@
-import ajv from '../utils/ajv.mjs';
-import { ValidationError } from '../errors/Errors.mjs';
+import ajv from './ajv.mjs';
+import { CriticalError } from '../../errors/Errors.mjs';
 
 export function stringifyAjvErrors(ajvErrors) {
   const errorMessages = [];
@@ -42,10 +42,9 @@ export function validateBySchema(object, schema) {
   const validate = ajv.compile(schema);
   if (!validate(object)) {
     const errorMessages = stringifyAjvErrors(validate.errors);
-    const addMessage = 'Запрос: ' + JSON.stringify({ object });
     let generalError = errorMessages.reduce((acc, msg) => (acc += `${msg}\n`), '');
     generalError = generalError.substring(0, generalError.length - 1);
-    throw new ValidationError(generalError, addMessage);
+    throw new CriticalError(generalError, 'VALIDATION_ERROR', 400);
   }
 }
 // refactor

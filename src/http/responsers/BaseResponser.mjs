@@ -9,7 +9,7 @@ export default class BaseResponser {
   buildSuccess(result) {}
 
   buildError(error) {
-    if (error.type === 'FORBIDDEN') {
+    if (error.status === 403) {
       return this.forbidden();
     }
 
@@ -20,7 +20,8 @@ export default class BaseResponser {
       notify(error).catch(console.log);
     }
 
-    if (['ValidationError', 'StatusError', 'InfoError'].includes(errName)) {
+    /** 'ValidationError', 'StatusError', 'InfoError' - DEPRECATED!!! **/
+    if (['ValidationError', 'StatusError', 'InfoError', 'CriticalError', 'NotificationError'].includes(errName)) {
       return this.badRequest(error);
     } else {
       return this.internalError();

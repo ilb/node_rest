@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import { checkInn } from './rules.js';
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -22,6 +23,22 @@ ajv.addKeyword('isNotEmpty', {
     ];
 
     return typeof data === 'string' && data.trim() !== '';
+  }
+});
+
+ajv.addKeyword('inn', {
+  type: 'string',
+  errors: true,
+  validate: function validate(length, data) {
+    validate.errors = [
+      {
+        keyword: 'inn',
+        message: 'ИНН введен некорректно',
+        params: { keyword: 'inn' }
+      }
+    ];
+
+    return !data || checkInn(data);
   }
 });
 
