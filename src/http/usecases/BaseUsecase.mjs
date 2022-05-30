@@ -1,5 +1,5 @@
-import Errors from '../errors/Errors.mjs';
-import { validateBySchema } from '../utils/schemaValidation.mjs';
+import Errors from '../../errors/Errors.mjs';
+import { validateBySchema } from '../../utils/schemaValidation.mjs';
 
 /**
  * Базовый класс для usecase
