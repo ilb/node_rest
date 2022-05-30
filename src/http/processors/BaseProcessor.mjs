@@ -17,7 +17,7 @@ export default class BaseProcessor {
     this.usecase = new usecase(scope.cradle);
   }
 
-  async build(req, res, next, usecase) {
+  async build(usecase) {
     try {
       await this.initialize(usecase);
       const result = await this.process();

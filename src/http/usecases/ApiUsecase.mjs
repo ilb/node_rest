@@ -3,8 +3,4 @@ import ApiProcessor from '../processors/ApiProcessor.mjs';
 
 export default class ApiUsecase extends BaseUsecase {
   builder = ApiProcessor;
-
-  constructor(scope) {
-    super(scope);
-  }
 }
