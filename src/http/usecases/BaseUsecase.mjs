@@ -19,9 +19,9 @@ import { validateBySchema } from '../validation/schemaValidation.mjs';
  * >--------------------------------------------------- PERMISSIONS ---------------------------------------------------<
  */
 export default class BaseUsecase {
-  constructor(scope = null) {
-    this.roleCode = scope?.roleCode;
-    this.accessControl = scope?.accessControl;
+  constructor({ roleCode, accessControl }) {
+    this.roleCode = roleCode;
+    this.accessControl = accessControl;
     this.permission = null;
   }
 
