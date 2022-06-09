@@ -1,8 +1,8 @@
-import BaseResponser from './BaseResponser.mjs';
+import BaseProcessor from './BaseProcessor.mjs';
 
-export default class FileResponser extends BaseResponser {
-  buildSuccess() {
-    const { file, contentType, filename } = this.result;
+export default class FileProcessor extends BaseProcessor {
+  async buildResponse(result) {
+    const { file, contentType, filename } = result;
 
     this.res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
     this.res.setHeader('Content-Length', file.length);

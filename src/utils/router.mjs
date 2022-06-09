@@ -1,6 +1,5 @@
 import nc from 'next-connect';
 import { onError, onNoMatch } from '../middlewares/errors.js';
-import ApiProcessor from './processors/ApiProcessor.mjs';
 
 class Router {
   constructor(params, createScope) {
@@ -40,12 +39,9 @@ class Router {
   }
 
   buildCallback(usecase) {
-    return (req, res, next) => {
-      const builderClass = usecase.builder ? usecase.builder : ApiProcessor;
-      const builder = new builderClass(this.createScope, req, res, next);
+    const builder = new usecase.builder(this.createScope);
 
-      return builder.build(usecase)
-    }
+    return (req, res, next) => builder.build(req, res, next, usecase)
   }
 
   setPrefix(prefix) {
