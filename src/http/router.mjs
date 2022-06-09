@@ -1,5 +1,5 @@
 import nc from 'next-connect';
-import { onError, onNoMatch } from './middlewares/errors.js';
+import { onError, onNoMatch } from '../middlewares/errors.js';
 import ApiProcessor from './processors/ApiProcessor.mjs';
 
 class Router {
