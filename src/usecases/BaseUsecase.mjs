@@ -23,28 +23,29 @@ export default class BaseUsecase {
     this.roleCode = roleCode;
     this.accessControl = accessControl;
     this.permission = null;
+    this.access = null
   }
 
   /**
    * Проверка прав при запросе страницы (обращение к функции prepare).
    */
   async checkAccess() {
-    await this.checkPermissions(this.permission);
+    await this.checkPermissions();
+    this.setAccess();
   }
 
   /**
    * Проверка наличия у пользователя необходимого права
-   *
-   * @param permission
    */
-  async checkPermissions(permission) {
-    if (permission) {
-      const { functionName, permissionName } = this.parsePermission(permission);
+  async checkPermissions() {
+    if (this.permission) {
+      const { functionName, permissionName } = this.parsePermission();
 
       if (!this.accessControl.can(this.roleCode)[functionName](permissionName).granted) {
         throw Errors.forbidden();
       }
-      if (functionName.substr(-3) === 'Own') {
+
+      if (functionName.substr(-3) === 'Own' && !this.checkAnyPermissions(functionName, permissionName)) {
         if (this.checkOwnPermissions && !(await this.checkOwnPermissions())) {
           throw Errors.forbidden();
         }
@@ -52,16 +53,21 @@ export default class BaseUsecase {
     }
   }
 
+  checkAnyPermissions(functionName, permissionName) {
+    functionName = functionName.substring(0, functionName.length - 3) + 'Any';
+
+    return this.accessControl.can(this.roleCode)[functionName](permissionName).granted
+  }
+
   async checkOwnPermissions() {
     return true;
   }
 
   /**
-   * @param permission {string}
    * @returns {{functionName: string, permissionName: string}}
    */
-  parsePermission(permission) {
-    const arr = permission.split('_');
+  parsePermission() {
+    const arr = this.permission.split('_');
 
     if (arr.length === 1) {
       return { functionName: 'readOwn', permissionName: arr[0] }
@@ -73,6 +79,15 @@ export default class BaseUsecase {
 
     if (arr.length === 3) {
       return { functionName: arr[0] + arr[1].charAt(0).toUpperCase() + arr[1].slice(1), permissionName: arr[2] }
+    }
+  }
+
+  setAccess() {
+    if (this.permission) {
+      const { permissionName } = this.parsePermission();
+      const permissions = Object.keys(this.accessControl._grants[this.roleCode][permissionName]);
+      const permission = permissions[permissions.length - 1];
+      this.access = permission.substring(0, permission.length - 4);
     }
   }
 
