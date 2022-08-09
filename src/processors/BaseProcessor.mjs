@@ -19,6 +19,12 @@ export default class BaseProcessor {
     try {
       await this.initialize(req, res, next);
       const result = await this.process(usecaseInstance);
+
+      if (this.res.finished) {
+        console.log('Response already sent');
+        return;
+      }
+
       await this.buildResponse(result);
     } catch (err) {
       console.log(err);
