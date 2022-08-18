@@ -63,7 +63,7 @@ class CustomError extends Error {
 }
 
 export class ValidationError extends CustomError {
-  constructor(message, addMessage) {
-    super(message, 'ValidationError', addMessage);
+  constructor(message) {
+    super(message, 'ValidationError');
   }
 }

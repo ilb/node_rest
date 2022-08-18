@@ -42,10 +42,9 @@ export function validateBySchema(object, schema) {
   const validate = ajv.compile(schema);
   if (!validate(object)) {
     const errorMessages = stringifyAjvErrors(validate.errors);
-    const addMessage = 'Запрос: ' + JSON.stringify({ object });
     let generalError = errorMessages.reduce((acc, msg) => (acc += `${msg}\n`), '');
     generalError = generalError.substring(0, generalError.length - 1);
-    throw new ValidationError(generalError, addMessage);
+    throw new ValidationError(generalError);
   }
 }
 // refactor

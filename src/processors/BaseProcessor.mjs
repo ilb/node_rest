@@ -9,6 +9,7 @@ export default class BaseProcessor {
   }
 
   async initialize(req, res, next) {
+    this.req = req;
     this.res = res;
     this.context = { query: { ...req.query, ...req.body, ...req.params }, req };
     this.scope = await this.createScope(this.context.req, next);
@@ -36,7 +37,7 @@ export default class BaseProcessor {
 
       if (!['INVALID', 'INFO'].includes(err.type)) {
         console.trace(err);
-        notify(err).catch(console.log);
+        notify(this.buildError(err)).catch(console.log);
       }
 
       if (['ValidationError', 'BadRequestError', 'StatusError', 'UserValidationError', 'InfoError'].includes(errName)) {
@@ -55,6 +56,21 @@ export default class BaseProcessor {
     instance.validate && await instance.validate(this.context.query);
 
     return instance.process(this.context.query);
+  }
+
+  buildError(err) {
+    return {
+      message: err.message,
+      stack: err.stack,
+      addMessage: JSON.stringify({
+        ...err.addMassage,
+        context: this.context.query,
+        info: {
+          route: this.req.url,
+          method: this.req.method
+        }
+      }, null, 2)
+    }
   }
 
   async buildResponse() {
