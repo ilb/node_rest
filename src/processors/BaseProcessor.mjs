@@ -65,6 +65,7 @@ export default class BaseProcessor {
       addMessage: JSON.stringify({
         ...err.addMassage,
         context: this.context.query,
+        session: this.scope.cradle.session,
         info: {
           route: this.req.url,
           method: this.req.method
