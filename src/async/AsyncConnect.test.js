@@ -48,13 +48,15 @@ describe('addTask()', () => {
   describe('When adding a new task through helper', () => {
     test('It should return function to execute response', () => {
       const response = {
-        redirect: jest.fn()
+        writeHead: jest.fn(() => ({
+          end: jest.fn()
+        }))
       };
       const executeResponse = RouteWithAsyncConnect.default.addTask();
       executeResponse(response);
-      expect(response.redirect).toBeCalledWith(
+      expect(response.writeHead).toBeCalledWith(
         303,
-        expect.stringMatching('/basePath/api/queues/test')
+        expect.objectContaining({ Location: expect.stringMatching('/basePath/api/queues/test') })
       );
     });
   });

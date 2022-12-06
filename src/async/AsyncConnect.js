@@ -21,7 +21,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
   const addTask = async (req, res) => {
     const context = req.body;
     const uuid = taskManager.addTask(task, { context });
-    res.redirect(303, `${basePath}${apiPath}/${uuid}`);
+    res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}` }).end();
   };
 
   /**
@@ -32,7 +32,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
   const getTask = async (req, res) => {
     const { uuid } = req.params;
     if (!taskManager.exists(uuid)) {
-      res.status(404).send();
+      res.writeHead(404).end();
       return;
     }
 
@@ -47,14 +47,14 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
         for (const [header, value] of response.headers.entries()) {
           res.setHeader(header, value);
         }
-        res.status(200).send(response.content);
+        res.writeHead(200).end(response.content);
         return;
       }
 
-      res.status(200).json(response);
+      res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(response));
     } else {
       res.setHeader('Refresh', `3;${basePath}${apiPath}/${uuid}`);
-      res.status(202).end();
+      res.writeHead(202).end();
     }
   };
 
@@ -69,7 +69,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
    */
   nextApiHandler.addTask = (context) => {
     const uuid = taskManager.addTask(task, { context });
-    return (res) => res.redirect(303, `${basePath}${apiPath}/${uuid}`);
+    return (res) => res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}` }).end();
   };
 
   return nextApiHandler;
