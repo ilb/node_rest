@@ -59,12 +59,16 @@ export default class BaseProcessor {
   }
 
   buildError(err) {
+    let data = this.context.query
+    if(this.scope.cradle.encryption){
+      data = this.scope.cradle.encryption.cipher(this.context.query,)
+    }
     return {
       message: err.message,
       stack: err.stack,
       addMessage: JSON.stringify({
         ...err.addMassage,
-        context: this.context.query,
+        context: data,
         session: this.scope.cradle.session,
         info: {
           route: this.req.url,
