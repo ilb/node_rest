@@ -1,19 +1,19 @@
 import BaseProcessor from './BaseProcessor.mjs';
 
 export default class AccessorProcessor extends BaseProcessor {
-  async buildResponse(result) {
+  async buildResponse(req, res, result) {
     const accessorUrl = process.env.BASE_URL + this.context.req.url;
 
-    if (this.res.finished) {
-      console.log(this.res.statusCode);
-      console.log(this.res.getHeaders());
+    if (res.finished) {
+      console.log(res.statusCode);
+      console.log(res.getHeaders());
     }
 
     if (result) {
-      this.res.status(200).json(result);
+      res.status(200).json(result);
     } else {
-      this.res.setHeader('Refresh', '3; ' + accessorUrl);
-      this.res.status(202).end();
+      res.setHeader('Refresh', '3; ' + accessorUrl);
+      res.status(202).end();
     }
   }
 }

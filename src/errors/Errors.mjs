@@ -31,7 +31,7 @@ export default class Errors {
     return new StatusError('CRITICAL', description, 500);
   }
 
-  static forbidden(description = 'Доступ запрещен!', type = 'FORBIDDEN') {
+  static forbidden(description = 'Отказано в доступе', type = 'FORBIDDEN') {
     return new StatusError(type, description, 403);
   }
 
@@ -43,7 +43,7 @@ export default class Errors {
     return new StatusError(type, description, 504);
   }
 
-  static invalid(description) {
+  static invalid(description = 'Невалидный запрос') {
     return new StatusError('INVALID', description, 400);
   }
 

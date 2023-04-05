@@ -41,7 +41,7 @@ class Router {
   buildCallback(usecase) {
     const builder = new usecase.builder(this.createScope);
 
-    return (req, res, next) => builder.build(req, res, next, usecase)
+    return async (req, res, next) => await builder.build(req, res, next, usecase)
   }
 
   setPrefix(prefix) {
