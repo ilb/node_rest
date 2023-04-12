@@ -58,7 +58,7 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
     }
   };
 
-  const nextApiHandler = nc().use(
+  const nextApiHandler = nc({ onError }).use(
     apiPath,
     nc({ attachParams: true, onError }).post(addTask).get(`/:uuid`, getTask)
   );
