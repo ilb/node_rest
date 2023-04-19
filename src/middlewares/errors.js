@@ -16,9 +16,9 @@ export const onError = (err, req, res) => {
   }
 
   if (!['INVALID', 'INFO'].includes(type)) {
-    let data = req.body.offer;
+    let data = req.body;
     if (req.scope.cradle.encryption) {
-      data = req.scope.cradle.encryption.cipher(req.context.query);
+      data = req.scope.cradle.encryption.cipher(data);
     }
     notify({
       message: err.message,
