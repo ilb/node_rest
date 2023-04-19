@@ -10,11 +10,35 @@ export const onError = (err, req, res) => {
   const status = err.status || 500;
   const type = err.type || 'UNHANDLED_ERROR';
   const description = err.description || 'Необработанная ошибка сервера';
-  console.error(err);
-  notify(err).catch(console.log);
 
   if (!res.finished) {
     res.status(status).json({ error: { type: type, description: description } });
+  }
+
+  if (!['INVALID', 'INFO'].includes(type)) {
+    let data = req.body;
+    if (req.scope.cradle.sensitiveDataMasker) {
+      data = req.scope.cradle.sensitiveDataMasker.mask(data);
+    }
+    notify({
+      message: err.message,
+      stack: err.stack,
+      addMessage: JSON.stringify(
+        {
+          ...err.addMassage,
+          context: data,
+          session: req.scope.cradle.session,
+          info: {
+            route: req.url,
+            method: req.method
+          }
+        },
+        null,
+        2
+      )
+    }).catch(console.log);
+  } else {
+    notify(err).catch(console.log);
   }
 };
 
