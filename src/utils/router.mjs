@@ -15,25 +15,25 @@ class Router {
   }
 
   get(pathOrUsecase, usecase) {
-    this.addHandler(pathOrUsecase, usecase, 'get')
+    this.addHandler(pathOrUsecase, usecase, 'get');
 
     return this;
   }
 
   post(pathOrUsecase, usecase) {
-    this.addHandler(pathOrUsecase, usecase, 'post')
+    this.addHandler(pathOrUsecase, usecase, 'post');
 
     return this;
   }
 
   put(pathOrUsecase, usecase) {
-    this.addHandler(pathOrUsecase, usecase, 'put')
+    this.addHandler(pathOrUsecase, usecase, 'put');
 
     return this;
   }
 
   delete(pathOrUsecase, usecase) {
-    this.addHandler(pathOrUsecase, usecase, 'delete')
+    this.addHandler(pathOrUsecase, usecase, 'delete');
 
     return this;
   }
@@ -41,7 +41,7 @@ class Router {
   buildCallback(usecase) {
     const builder = new usecase.builder(this.createScope);
 
-    return async (req, res, next) => await builder.build(req, res, next, usecase)
+    return async (req, res, next) => await builder.build(req, res, next, usecase);
   }
 
   setPrefix(prefix) {
@@ -56,9 +56,9 @@ class Router {
 
   addHandler(pathOrUsecase, usecase, method) {
     if (this.isPath(pathOrUsecase)) {
-      this.nextConnect[method](this.prefix + pathOrUsecase, this.buildCallback(usecase))
+      this.nextConnect[method](this.prefix + pathOrUsecase, this.buildCallback(usecase));
     } else {
-      this.nextConnect[method](this.buildCallback(pathOrUsecase))
+      this.nextConnect[method](this.buildCallback(pathOrUsecase));
     }
   }
 
@@ -67,6 +67,6 @@ class Router {
   }
 }
 
-export default (createScope) => {
+export default (createScope, onNoMatch = onNoMatch, onError = onError) => {
   return new Router({ attachParams: true, onNoMatch, onError }, createScope);
-}
+};
