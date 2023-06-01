@@ -1,6 +1,6 @@
 {
   "name": "@ilb/node_rest",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "Node REST utils",
   "type": "module",
   "main": "src/index.js",
