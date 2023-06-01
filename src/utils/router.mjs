@@ -67,6 +67,6 @@ class Router {
   }
 }
 
-export default (createScope, onNoMatch = onNoMatch, onError = onError) => {
-  return new Router({ attachParams: true, onNoMatch, onError }, createScope);
+export default (createScope, match = onNoMatch, error = onError) => {
+  return new Router({ attachParams: true, onNoMatch: match, onError: error }, createScope);
 };
