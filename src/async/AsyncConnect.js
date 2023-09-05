@@ -1,7 +1,7 @@
 import nc from 'next-connect';
 import Response from './Response.js';
 
-const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
+const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => {
   if (!path) throw new Error('API path should be defined');
   if (!taskManager) throw new Error('Task manager should be defined');
   if (!task) throw new Error('Task function should be defined');
@@ -32,7 +32,8 @@ const AsyncConnect = ({ path, taskManager, task, onError } = {}) => {
   const getTask = async (req, res) => {
     const { uuid } = req.params;
     if (!taskManager.exists(uuid)) {
-      res.writeHead(404).end();
+      if (onNotFound) onNotFound(req, res);
+      else res.writeHead(404).end();
       return;
     }
 
