@@ -56,7 +56,7 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
       res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(response));
     } else {
       res.setHeader('Refresh', `3;${basePath}${apiPath}/${uuid}?i=${iteration + 1}`);
-      res.writeHead(202).end();
+      res.writeHead(202).end(`Waiting iteration: ${iteration}`);
     }
   };
 
