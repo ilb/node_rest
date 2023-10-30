@@ -21,7 +21,7 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
   const addTask = async (req, res) => {
     const context = req.body;
     const uuid = taskManager.addTask(task, { context });
-    res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}` }).end();
+    res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}?i=0` }).end();
   };
 
   /**
@@ -30,7 +30,7 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
    * @param {*} res
    */
   const getTask = async (req, res) => {
-    const { uuid } = req.params;
+    const { uuid, i = 0 } = req.params;
     if (!taskManager.exists(uuid)) {
       if (onNotFound) onNotFound(req, res);
       else res.writeHead(404).end();
@@ -54,7 +54,7 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
 
       res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(response));
     } else {
-      res.setHeader('Refresh', `3;${basePath}${apiPath}/${uuid}`);
+      res.setHeader('Refresh', `3;${basePath}${apiPath}/${uuid}?i=${i + 1}`);
       res.writeHead(202).end();
     }
   };
@@ -70,7 +70,7 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
    */
   nextApiHandler.addTask = (context) => {
     const uuid = taskManager.addTask(task, { context });
-    return (res) => res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}` }).end();
+    return (res) => res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}?i=0` }).end();
   };
 
   return nextApiHandler;
