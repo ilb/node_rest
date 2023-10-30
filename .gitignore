@@ -4,3 +4,5 @@ ilb-node_rest*
 
 # Output of 'npm pack'
 *.tgz
+.idea
+pnpm-lock.yaml

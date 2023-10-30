@@ -30,7 +30,8 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
    * @param {*} res
    */
   const getTask = async (req, res) => {
-    const { uuid, i = 0 } = req.params;
+    const { uuid } = req.params;
+    const iteration = req.params.i || +req.url.split('i=').pop();
     if (!taskManager.exists(uuid)) {
       if (onNotFound) onNotFound(req, res);
       else res.writeHead(404).end();
@@ -54,7 +55,7 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
 
       res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(response));
     } else {
-      res.setHeader('Refresh', `3;${basePath}${apiPath}/${uuid}?i=${i + 1}`);
+      res.setHeader('Refresh', `3;${basePath}${apiPath}/${uuid}?i=${iteration + 1}`);
       res.writeHead(202).end();
     }
   };
