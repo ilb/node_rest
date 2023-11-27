@@ -71,7 +71,10 @@ const AsyncConnect = ({ path, taskManager, task, onError, onNotFound } = {}) => 
    */
   nextApiHandler.addTask = (context) => {
     const uuid = taskManager.addTask(task, { context });
-    return (res) => res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}?i=0` }).end();
+    return [
+      uuid,
+      (res) => res.writeHead(303, { Location: `${basePath}${apiPath}/${uuid}?i=0` }).end()
+    ];
   };
 
   return nextApiHandler;
