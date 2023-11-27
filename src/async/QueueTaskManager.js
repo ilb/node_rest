@@ -13,7 +13,7 @@ export default class QueueTaskManager {
     this.queue.add(
       async () => {
         try {
-          const result = await task(context);
+          const result = await task({ ...context, taskUid: uid });
           this.cache.set(uid, result, 10000);
         } catch (e) {
           this.cache.set(uid, e, 10000);
