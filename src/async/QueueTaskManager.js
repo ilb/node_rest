@@ -13,6 +13,7 @@ export default class QueueTaskManager {
     this.queue.add(
       async () => {
         try {
+          this.cache.set(uid, 'PENDING');
           const result = await task({ ...context, taskUid: uid });
           this.cache.set(uid, result, 10000);
         } catch (e) {
@@ -24,11 +25,10 @@ export default class QueueTaskManager {
     return uid;
   }
   exists(uid) {
-    return this.queue.sizeBy({ uid }) > 0 || this.queue.pending > 0 || this.cache.has(uid);
+    return this.cache.has(uid);
   }
   isDone(uid) {
-    // const result = this.cache.get(uid);
-    return this.cache.has(uid);
+    return this.cache.has(uid) && this.cache.get(uid) !== 'PENDING';
   }
   getResult(uid) {
     return this.cache.get(uid);
