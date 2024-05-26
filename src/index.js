@@ -5,4 +5,4 @@ import AccessorUsecase from './usecases/AccessorUsecase.mjs';
 import router from './utils/router.mjs';
 import BaseProcessor from './processors/BaseProcessor.mjs';
 
-export { BaseUsecase, ApiUsecase, FileUsecase, AccessorUsecase,BaseProcessor, router };
+export { BaseUsecase, ApiUsecase, FileUsecase, AccessorUsecase, BaseProcessor, router };
